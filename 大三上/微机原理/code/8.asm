@@ -1,0 +1,48 @@
+DATA SEGMENT USE16
+		BUF DB '3','4','8','9'
+		COUNT EQU $-BUF
+DATA ENDS
+CODE SEGMENT USE16
+ASSUME CS:CODE,DS:DATA
+BEG: 	MOV AX,DATA
+		MOV DS,AX
+		MOV CX,COUNT
+		MOV SI,OFFSET BUF
+		MOV AX,0
+		;AX用于存放累加和，清0
+		MOV DH,0
+		;DH清0
+		MOV BX,10
+		;权10→BX
+AGA: 	MUL BX
+		; AXx10→AX
+		MOV DL,[SI]
+		;取出ASCII码字符
+		SUB DL,30H
+		;减去30H
+		ADD AX,DX
+		;累加
+		INC SI
+		LOOP AGA
+		MOV BX,AX
+		CALL DISP
+		;调用二进制显示程序
+		MOV AH,2
+		MOV DL,'B'
+		INT 21H
+EXIT: 	MOV AH,4CH
+		INT 21H
+;---------------------------------
+DISP PROC ;显示BX中的二进制数
+		MOV CX,16
+LAST: 	MOV DL,'0'
+		RCL BX,1
+		JNC NEXT
+		MOV DX,'1'
+NEXT: 	MOV AH,2
+		INT 21H
+		LOOP LAST
+		RET
+DISP ENDP
+CODE ENDS
+END BEG
